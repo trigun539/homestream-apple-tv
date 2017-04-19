@@ -1,24 +1,107 @@
 import { get } from 'axios';
 import List    from 'templates/list';
 
+const SERVER_URL = 'http://localhost:9001';
+const BASE_URL   = 'http://192.168.1.48:46005';
+let url          = '/api/files';
+let items        = [];
+
+function unloadHandler () {
+	items.pop();
+}
+
+function playVideo () {
+	const singleVideo = new MediaItem('video', buildVideoURL());
+	const videoList   = new Playlist();
+	const myPlayer    = new Player();
+
+	videoList.push(singleVideo)
+	myPlayer.playlist = videoList;
+
+	myPlayer.addEventListener("shouldHandleStateChange", (e) => {
+		items.pop();
+	});
+
+	myPlayer.play();
+}
+
+function buildVideoURL () {
+	let newURL = `${BASE_URL}`;
+
+	items.forEach((x, i) => {
+		if (i != 0) {
+			newURL += `/${encodeURIComponent(x)}`;
+		}
+	});
+
+	console.log(newURL);
+	return newURL;
+}
+
+function buildURL () {
+	let newURL = `${BASE_URL}${url}?path=`;
+
+	items.forEach((x, i) => {
+		if (i === 0) {
+			newURL += `${encodeURIComponent(x)}`;
+		} else {
+			newURL += `/${encodeURIComponent(x)}`;
+		}
+	});
+
+	console.log(newURL);
+	return newURL;
+}
+
+function selectHandler (item) {
+
+	if (item) {
+		items.push(item);
+	}
+
+	if (/\.(mp4|m4v)$/.test(item)) {
+		playVideo();
+	} else {
+		get(buildURL())
+			.then(res => {
+				const items = res.data.map(x => {
+					return { title: x };
+				});
+
+				showList(items);
+			})
+			.catch(err => {
+				var alert = createAlert('Error!', 'Fetching locations');
+				navigationDocument.pushDocument(alert);
+			});
+	}
+}
+
+function showList (files) {
+	const list = List(SERVER_URL, 'Files', files, selectHandler, unloadHandler);
+	navigationDocument.pushDocument(list);
+}
+
 App.onLaunch = (options) => {
-	const homestreamBaseURL = 'http://192.168.1.48:46005';
-	var alert = createAlert("Hello World!", "Welcome to tvOS");
+
+	const alert = createAlert("Hello World!", "Welcome to tvOS");
 	navigationDocument.pushDocument(alert);
 
+	selectHandler();
+
 	// Fetching data
-	get(`${homestreamBaseURL}/api/locations`)
-		.then(res => {
-			const items = res.data.map(x => {
-				return { title: x };
-			});
-			const list = List(homestreamBaseURL, 'Locations', items);
-			navigationDocument.pushDocument(list);
-		})
-		.catch(err => {
-			var alert = createAlert('Error!', 'Fetching locations');
-			navigationDocument.pushDocument(alert);
-		});
+	// get(`${BASE_URL}/api/files`)
+	// 	.then(res => {
+	// 		const items = res.data.map(x => {
+	// 			return { title: x };
+	// 		});
+
+	// 		showList(items);
+	// 	})
+	// 	.catch(err => {
+	// 		var alert = createAlert('Error!', 'Fetching locations');
+	// 		navigationDocument.pushDocument(alert);
+	// 	});
 }
 
 
