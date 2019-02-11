@@ -1,8 +1,9 @@
 import { get } from 'axios';
 import List    from 'templates/list';
+import Loading from 'templates/loading';
 
-const SERVER_URL = 'http://localhost:9001';
-const BASE_URL   = 'http://192.168.1.48:46005';
+const SERVER_URL = 'http://192.168.1.4:9001';
+const BASE_URL   = 'http://192.168.1.184:46005';
 let url          = '/api/files';
 let items        = [];
 
@@ -18,7 +19,8 @@ function playVideo () {
 	videoList.push(singleVideo)
 	myPlayer.playlist = videoList;
 
-	myPlayer.addEventListener("shouldHandleStateChange", (e) => {
+	myPlayer.addEventListener('mediaItemDidChange', (e) => {
+		console.log('mediaitem changed: ', e);
 		items.pop();
 	});
 
@@ -49,7 +51,6 @@ function buildURL () {
 		}
 	});
 
-	console.log(newURL);
 	return newURL;
 }
 
@@ -61,7 +62,7 @@ function selectHandler (item) {
 
 	if (/\.(mp4|m4v)$/.test(item)) {
 		playVideo();
-	} else {
+  } else {
 		get(buildURL())
 			.then(res => {
 				const items = res.data.map(x => {
@@ -83,25 +84,10 @@ function showList (files) {
 }
 
 App.onLaunch = (options) => {
-
-	const alert = createAlert("Hello World!", "Welcome to tvOS");
-	navigationDocument.pushDocument(alert);
+	const loading = Loading();
+	navigationDocument.pushDocument(loading);
 
 	selectHandler();
-
-	// Fetching data
-	// get(`${BASE_URL}/api/files`)
-	// 	.then(res => {
-	// 		const items = res.data.map(x => {
-	// 			return { title: x };
-	// 		});
-
-	// 		showList(items);
-	// 	})
-	// 	.catch(err => {
-	// 		var alert = createAlert('Error!', 'Fetching locations');
-	// 		navigationDocument.pushDocument(alert);
-	// 	});
 }
 
 
