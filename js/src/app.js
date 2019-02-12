@@ -19,10 +19,11 @@ function playVideo () {
 	videoList.push(singleVideo)
 	myPlayer.playlist = videoList;
 
-	myPlayer.addEventListener('mediaItemDidChange', (e) => {
-		console.log('mediaitem changed: ', e);
-		items.pop();
-	});
+  myPlayer.addEventListener('stateDidChange', (e) => {
+    if (e.state === 'end') {
+		  items.pop();
+    }
+  });
 
 	myPlayer.play();
 }
@@ -36,7 +37,9 @@ function buildVideoURL () {
 		}
 	});
 
+  console.log('************ NEW URL *******************');
 	console.log(newURL);
+  console.log('*******************************');
 	return newURL;
 }
 
@@ -55,7 +58,6 @@ function buildURL () {
 }
 
 function selectHandler (item) {
-
 	if (item) {
 		items.push(item);
 	}
@@ -69,9 +71,12 @@ function selectHandler (item) {
 					return { title: x };
 				});
 
-				showList(items);
+        showList(items);
+        console.log('Finished showing items');
 			})
-			.catch(err => {
+      .catch(err => {
+	      items.pop();
+        console.log('error while getting data: ', err);
 				var alert = createAlert('Error!', 'Fetching locations');
 				navigationDocument.pushDocument(alert);
 			});
@@ -91,22 +96,15 @@ App.onLaunch = (options) => {
 }
 
 
-App.onWillResignActive = () => {
+App.onWillResignActive = () => {}
 
-}
+App.onDidEnterBackground = () => {}
 
-App.onDidEnterBackground = () => {
+App.onWillEnterForeground = () => {}
 
-}
+App.onDidBecomeActive = () => {}
 
-App.onWillEnterForeground = () => {
-}
-
-App.onDidBecomeActive = () => {
-}
-
-App.onWillTerminate = () => {
-}
+App.onWillTerminate = () => {}
 
 /**
  * This convenience funnction returns an alert template, which can be used to present errors to the user.

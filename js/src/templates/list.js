@@ -4,17 +4,18 @@ import WarningIcon from 'assets/img/warning.png';
 
 export default function List (url, title, items, selectHandler, unloadHandler) {
 
-	console.log(url, VideoIcon);
 	let itemsXML = '';
 
-	items.forEach(x => {
-		let icon = FolderIcon;
+  items.forEach(x => {
+		let icon;
 
 		if (/\.(mp4|m4v)$/.test(x.title)) {
 			icon = VideoIcon;
 		} else if (/\.(zip|avi|mkv|tar|mp3)$/.test(x.title)) {
 			icon = WarningIcon;
-		}
+    } else {
+		  icon = FolderIcon;
+    }
 
 		const itemImg = `
 			<lockup>
@@ -23,34 +24,34 @@ export default function List (url, title, items, selectHandler, unloadHandler) {
 		`;
 
 		itemsXML += `
-			<listItemLockup>
-					<title>${x.title}</title>
-					<relatedContent>${itemImg}</relatedContent>
-			</listItemLockup>
+    <listItemLockup>
+      <title>${x.title}</title>
+      <relatedContent>${itemImg}</relatedContent>
+    </listItemLockup>
 		`;
 	});
 
 	const templateString = `<?xml version="1.0" encoding="UTF-8" ?>
-		<document>
-			<listTemplate>
-				<banner>
-					<title>HomeStream</title>
-				</banner>
-				<list>
-					<header>
-							<title>${title}</title>
-					</header>
-					<section>
-						${itemsXML}
-					</section>
-				</list>
-			</listTemplate>
-		</document>`;
+<document>
+  <listTemplate>
+    <banner>
+      <title>HomeStream</title>
+    </banner>
+    <list>
+      <header>
+        <title>${title}</title>
+      </header>
+      <section>${itemsXML}</section>
+    </list>
+  </listTemplate>
+</document>`;
 
+  console.log(templateString);
 	const parser = new DOMParser();
-	const doc = parser.parseFromString(templateString, "application/xml");
-	doc.addEventListener('select', (e) => { selectHandler(e.target.textContent); }, false);
+  const doc = parser.parseFromString(templateString, "application/xml");
+
+  doc.addEventListener('select', (e) => {selectHandler(e.target.textContent);}, false);
 	doc.addEventListener('unload', unloadHandler, false);
 
-		return doc;
+	return doc;
 }
