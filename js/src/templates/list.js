@@ -1,6 +1,7 @@
 import VideoIcon from 'assets/img/video.png';
 import FolderIcon from 'assets/img/folder.png';
 import WarningIcon from 'assets/img/warning.png';
+import xmlescape from 'xml-escape';
 
 export default function List (url, title, items, selectHandler, unloadHandler) {
 
@@ -21,14 +22,13 @@ export default function List (url, title, items, selectHandler, unloadHandler) {
 			<lockup>
 					<img src="${url}/${icon}" width="857" height="482" />
 			</lockup>
-		`;
+    `;
 
 		itemsXML += `
-    <listItemLockup>
-      <title>${x.title}</title>
-      <relatedContent>${itemImg}</relatedContent>
-    </listItemLockup>
-		`;
+      <listItemLockup>
+        <title>${xmlescape(x.title)}</title>
+        <relatedContent>${itemImg}</relatedContent>
+      </listItemLockup>`;
 	});
 
 	const templateString = `<?xml version="1.0" encoding="UTF-8" ?>
@@ -46,9 +46,10 @@ export default function List (url, title, items, selectHandler, unloadHandler) {
   </listTemplate>
 </document>`;
 
-  console.log(templateString);
 	const parser = new DOMParser();
   const doc = parser.parseFromString(templateString, "application/xml");
+
+  console.log(templateString);
 
   doc.addEventListener('select', (e) => {selectHandler(e.target.textContent);}, false);
 	doc.addEventListener('unload', unloadHandler, false);
