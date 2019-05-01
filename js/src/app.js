@@ -2,8 +2,8 @@ import { get } from 'axios';
 import List    from 'templates/list';
 import Loading from 'templates/loading';
 
-const SERVER_URL = 'http://192.168.1.184:9001';
-const BASE_URL   = 'http://192.168.1.184:46005';
+const SERVER_URL = 'http://192.168.0.40:9001';
+const BASE_URL   = 'http://192.168.0.40:46005';
 let url          = '/api/files';
 let items        = [];
 
